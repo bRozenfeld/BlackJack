@@ -6,5 +6,6 @@ import java.rmi.RemoteException;
 public interface Card extends Remote {
 
     Integer getValue() throws RemoteException;
-    String getColor() throws RemoteException;
+    Type getType() throws RemoteException;
+    Name getName() throws RemoteException;
 }
