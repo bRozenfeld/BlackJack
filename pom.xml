@@ -20,6 +20,7 @@
     <modules>
         <module>Player</module>
         <module>Casino</module>
+        <module>Common</module>
     </modules>
 
 
