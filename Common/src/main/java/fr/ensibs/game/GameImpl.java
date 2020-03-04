@@ -12,6 +12,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Random;
 
 /**
  * Class that take care of starting the game and do the role of the dealer
@@ -52,7 +53,7 @@ public class GameImpl implements Game {
 
     @Override
     public boolean register(Player player) throws RemoteException {
-        return false;
+        return players.add(player);
     }
 
     @Override
@@ -60,10 +61,42 @@ public class GameImpl implements Game {
 
     }
 
+    @Override
+    public void askPlayersAction() throws RemoteException {
+        for(Player p : players) {
+            while(p.getAction() == Action.WAIT) {
+                try {
+                    Thread.sleep(2000);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
     public static void play() throws RemoteException {
+        state = State.Running;
         initCards();
+        System.out.println("Game started");
+        int random = getRandomInt();
+
+        for(Player p : players) {
+            Card c = cards.remove(random);
+            p.addCard(c);
+            random = getRandomInt();
+        }
+
+        Card dealerCard = cards.remove(random);
+        dealerCards.add(dealerCard);
+
+        for(Player p : players) {
+            Card c = cards.remove(random);
+            p.addCard(c);
+            random = getRandomInt();
+        }
     }
+
 
     private static void initCards() throws RemoteException {
         for(int i = 0; i < 4; i++) {
@@ -124,7 +157,7 @@ public class GameImpl implements Game {
                         c = new DefaultCard(type, Name.Queen);
                         break;
                 }
-
+                cards.add(c);
             }
         }
     }
@@ -138,6 +171,12 @@ public class GameImpl implements Game {
         System.out.println("with :");
         System.out.println("<host> : host of the server");
         System.out.println("<port> : port of the server");
+    }
+
+
+    private static int getRandomInt() {
+        Random rand = new Random();
+        return rand.nextInt(cards.size());
     }
 
     public static void main(String[] args) throws RemoteException {

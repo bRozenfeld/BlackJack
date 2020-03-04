@@ -93,7 +93,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
      * @param card card to add to the list of player cards
      */
     @Override
-    public void AddCard(Card card) {
+    public void addCard(Card card) {
         this.cards.add(card);
     }
 }

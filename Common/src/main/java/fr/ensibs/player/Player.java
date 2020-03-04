@@ -40,6 +40,6 @@ public interface Player extends Remote {
      * Add a card to the player list of cards
      * @param card card to add to the list of player cards
      */
-    void AddCard(Card card);
+    void addCard(Card card);
 
 }

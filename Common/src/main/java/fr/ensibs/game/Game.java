@@ -24,4 +24,9 @@ public interface Game extends Remote {
      */
     public void startGame() throws RemoteException;
 
+
+    public void askPlayersAction() throws RemoteException;
+
+
+
 }
