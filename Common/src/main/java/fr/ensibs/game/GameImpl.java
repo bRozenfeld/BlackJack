@@ -4,6 +4,7 @@ import fr.ensibs.card.Card;
 import fr.ensibs.card.DefaultCard;
 import fr.ensibs.card.Name;
 import fr.ensibs.card.Type;
+import fr.ensibs.player.Action;
 import fr.ensibs.player.Player;
 
 import java.rmi.RemoteException;
