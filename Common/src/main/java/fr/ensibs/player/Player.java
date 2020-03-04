@@ -11,31 +11,31 @@ public interface Player extends Remote {
      * Give the player name
      * @return the player name
      */
-    String getName();
+    String getName() throws RemoteException;
 
     /**
      * Set player name
      * @param name player name
      */
-    void setName(String name);
+    void setName(String name) throws RemoteException;
 
     /**
      * Get the player score
      * @return player score
      */
-    Integer getScore();
+    Integer getScore() throws RemoteException;
 
     /**
      * Set the player score
      * @param score player score
      */
-    void setScore(Integer score);
+    void setScore(Integer score) throws RemoteException;
 
     /**
      * Get the player list of cards
      * @return list of player cards
      */
-    List<Card> getCards();
+    List<Card> getCards() throws RemoteException;
 
     /**
      * Add a card to the player list of cards

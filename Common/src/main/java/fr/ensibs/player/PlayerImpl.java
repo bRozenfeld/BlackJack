@@ -99,6 +99,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
      */
     @Override
     public void addCard(Card card) {
+        System.out.println("Add card called.");
         this.cards.add(card);
     }
 

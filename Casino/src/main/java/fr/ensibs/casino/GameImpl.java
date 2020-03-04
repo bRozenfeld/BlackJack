@@ -1,9 +1,11 @@
-package fr.ensibs.game;
+package fr.ensibs.casino;
 
 import fr.ensibs.card.Card;
 import fr.ensibs.card.DefaultCard;
 import fr.ensibs.card.Name;
 import fr.ensibs.card.Type;
+import fr.ensibs.game.Game;
+import fr.ensibs.game.State;
 import fr.ensibs.player.Action;
 import fr.ensibs.player.Player;
 
@@ -12,8 +14,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Random;
+
+import static java.lang.System.exit;
 
 /**
  * Class that take care of starting the game and do the role of the dealer
@@ -62,8 +65,7 @@ public class GameImpl implements Game {
 
     }
 
-    @Override
-    public void askPlayersAction() throws RemoteException {
+    public static void askPlayersAction() throws RemoteException {
         for(Player p : players) {
             while(p.getAction() == Action.WAIT) {
                 try {
@@ -77,9 +79,10 @@ public class GameImpl implements Game {
 
 
     public static void play() throws RemoteException {
+        System.out.println("Game started !");
+
         state = State.Running;
         initCards();
-        System.out.println("Game started");
         int random = getRandomInt();
 
         for(Player p : players) {
@@ -96,6 +99,8 @@ public class GameImpl implements Game {
             p.addCard(c);
             random = getRandomInt();
         }
+
+        askPlayersAction();
     }
 
 
@@ -172,6 +177,7 @@ public class GameImpl implements Game {
         System.out.println("with :");
         System.out.println("<host> : host of the server");
         System.out.println("<port> : port of the server");
+        exit(1);
     }
 
 
@@ -190,7 +196,7 @@ public class GameImpl implements Game {
 
         try {
             Game game = new GameImpl();
-            Game stub = (Game) UnicastRemoteObject.exportObject(game);
+            Game stub = (Game) UnicastRemoteObject.exportObject(game, 0);
             Registry registry = LocateRegistry.createRegistry(PORT);
             String url = "rmi://" + HOST + ":" + PORT + "/" + OBJECT;
             registry.bind(url, stub);
@@ -203,11 +209,13 @@ public class GameImpl implements Game {
             if(players.size() > 0) {
                 play();
             }
+            System.out.println("Waiting for players...");
             try {
                 Thread.sleep(30 * 1000);
             } catch(Exception e) {
                 e.printStackTrace();
             }
+
         }
     }
 
