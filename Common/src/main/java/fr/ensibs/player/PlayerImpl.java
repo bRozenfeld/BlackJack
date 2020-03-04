@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class PlayerImpl extends UnicastRemoteObject implements Player {
     /**
@@ -48,7 +49,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
      * @return the player name
      */
     @Override
-    public String getName() {
+    public String getName() throws RemoteException {
         return this.name;
     }
 
@@ -58,7 +59,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
      * @param name player name
      */
     @Override
-    public void setName(String name) {
+    public void setName(String name) throws RemoteException {
         this.name=name;
     }
 
@@ -88,7 +89,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
      * @return list of player cards
      */
     @Override
-    public List<Card> getCards() {
+    public List<Card> getCards() throws RemoteException {
         return this.cards;
     }
 
@@ -98,8 +99,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
      * @param card card to add to the list of player cards
      */
     @Override
-    public void addCard(Card card) {
-        System.out.println("Add card called.");
+    public void addCard(Card card) throws RemoteException {
         this.cards.add(card);
     }
 
@@ -117,4 +117,74 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
     public void setAction(Action action) throws RemoteException{
         this.action=action;
     }
+
+    /*******************Private methods*********************/
+    public void chooseAction()throws RemoteException
+    {
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        if (line.startsWith("action") || line.startsWith("ACTION")) {
+            displayAction();
+        }else {
+            switch (line) {
+                case "wait":
+                case "WAIT":
+                    waiT();
+                    break;
+                case "addcard":
+                case "ADDCARD":
+                    addCard();
+                    break;
+                case "stop":
+                case "STOP":
+                    stop();
+                    break;
+                case "quit":
+                case "QUIT":
+                    System.exit(0);
+            }
+        }
+    }
+
+    /**
+     * Display the status of the device having the given id, if it exists
+     *
+     */
+    public void displayAction() throws RemoteException
+    {
+        Action action = this.getAction();
+        if (action == null) {
+            System.out.println("player " + this.getName() + " not found");
+        } else {
+            System.out.println("player " + this.getName() + ": " + action);
+        }
+    }
+
+    /**
+     * Stop the device
+     */
+    public void stop() throws RemoteException
+    {
+        this.setAction(Action.WAIT);
+        try { Thread.sleep(2000); } catch (Exception e) { }
+
+    }
+
+    /**
+     *
+     */
+    public void addCard() throws RemoteException
+    {
+        this.setAction(Action.ADDCARD);
+        try { Thread.sleep(2000); } catch (Exception e) { }
+    }
+    /**
+     *
+     */
+    public void waiT() throws RemoteException
+    {
+        this.setAction(Action.WAIT);
+        try { Thread.sleep(2000); } catch (Exception e) { }
+    }
+
 }

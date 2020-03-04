@@ -49,7 +49,7 @@ public class PlayerApp {
                 String url = "rmi://" + HOST + ":" + PORT + "/" + obj_name;
                 Game game=(Game) registry.lookup(url);
                 PlayerApp player=new PlayerApp(args[2],game);
-                player.run();
+                //player.run();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -69,73 +69,6 @@ public class PlayerApp {
        this.game.register(player);
     }
 
-    public void run()throws RemoteException
-    {
-        Scanner scanner = new Scanner(System.in);
-        String line = scanner.nextLine();
-        if (line.startsWith("action") || line.startsWith("ACTION")) {
-            displayAction();
-        }else {
-            switch (line) {
-                case "wait":
-                case "WAIT":
-                    waiT();
-                    break;
-                case "addcard":
-                case "ADDCARD":
-                    addCard();
-                    break;
-                case "stop":
-                case "STOP":
-                    stop();
-                    break;
-                case "quit":
-                case "QUIT":
-                    System.exit(0);
-            }
-        }
-    }
-
-    /**
-     * Display the status of the device having the given id, if it exists
-     *
-     */
-    public void displayAction() throws RemoteException
-    {
-        Action action = this.player.getAction();
-        if (action == null) {
-            System.out.println("player " + this.player.getName() + " not found");
-        } else {
-            System.out.println("player " + this.player.getName() + ": " + action);
-        }
-    }
-
-    /**
-     * Stop the device
-     */
-    public void stop() throws RemoteException
-    {
-        this.player.setAction(Action.WAIT);
-        try { Thread.sleep(2000); } catch (Exception e) { }
-
-    }
-
-    /**
-     *
-     */
-    public void addCard() throws RemoteException
-    {
-        this.player.setAction(Action.ADDCARD);
-        try { Thread.sleep(2000); } catch (Exception e) { }
-    }
-    /**
-     *
-     */
-    public void waiT() throws RemoteException
-    {
-        this.player.setAction(Action.WAIT);
-        try { Thread.sleep(2000); } catch (Exception e) { }
-    }
 
 
 
