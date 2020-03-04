@@ -118,32 +118,109 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
         this.action=action;
     }
 
-    /*******************Private methods*********************/
+    @Override
     public void chooseAction()throws RemoteException
     {
+        System.out.println("Continue[0] or Stop[1] ?");
         Scanner scanner = new Scanner(System.in);
-        String line = scanner.nextLine();
-        if (line.startsWith("action") || line.startsWith("ACTION")) {
-            displayAction();
-        }else {
-            switch (line) {
-                case "wait":
-                case "WAIT":
-                    waiT();
+        Integer line = scanner.nextInt();
+        switch (line) {
+            case 0:
+                addCard();
+                break;
+            case 1:
+                stop();
+                break;
+        }
+    }
+
+    @Override
+    public void displayCards() throws RemoteException {
+        String s = "";
+        for(Card c : cards) {
+            s += "+-------+\t";
+        }
+        s += "\n";
+        for(Card c : cards) {
+            switch(c.getName()) {
+                case Ace:
+                    s += "| 1     |";
                     break;
-                case "addcard":
-                case "ADDCARD":
-                    addCard();
+                case Two:
+                    s += "| 2     |";
                     break;
-                case "stop":
-                case "STOP":
-                    stop();
+                case Three:
+                    s += "| 3     |";
                     break;
-                case "quit":
-                case "QUIT":
-                    System.exit(0);
+                case Four:
+                    s += "| 4     |";
+                    break;
+                case Five:
+                    s += "| 5     |";
+                    break;
+                case Six:
+                    s += "| 6     |";
+                    break;
+                case Seven:
+                    s += "| 7     |";
+                    break;
+                case Eight:
+                    s += "| 8     |";
+                    break;
+                case Nine:
+                    s += "| 9     |";
+                    break;
+                case Ten:
+                    s += "| 10    |";
+                    break;
+                case Jack:
+                    s += "| J     |";
+                    break;
+                case Queen:
+                    s += "| Q     |";
+                    break;
+                case King:
+                    s += "| K     |";
+                    break;
+            }
+            s += "\t";
+        }
+        s += "\n";
+        for(Card c : cards) {
+            s += "|       |\t";
+        }
+        s += "\n";
+        for(Card c : cards) {
+            switch (c.getType()) {
+                case Diamond:
+                    s += "|   \u2666   |\t";
+                    break;
+                case Spade:
+                    s += "|   \u2660   |\t";
+                    break;
+                case Heart:
+                    s += "|   \u2665   |\t";
+                    break;
+                case Club:
+                    s += "|   \u2663   |\t";
+                    break;
             }
         }
+        s += "\n";
+        for(Card c : cards) {
+            s += "|       |\t";
+        }
+        s += "\n";
+        for(Card c : cards) {
+            s += "|       |\t";
+        }
+        s += "\n";
+        for(Card c : cards) {
+            s += "+-------+\t";
+        }
+        s += "\n";
+
+        System.out.println(s);
     }
 
     /**

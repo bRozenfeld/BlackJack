@@ -50,4 +50,8 @@ public interface Player extends Remote {
     Action getAction() throws RemoteException;
 
     void setAction(Action action) throws RemoteException;
+
+    void chooseAction()throws RemoteException;
+
+    void displayCards() throws RemoteException;
 }

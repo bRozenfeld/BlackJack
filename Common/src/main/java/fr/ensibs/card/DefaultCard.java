@@ -13,7 +13,7 @@ public class DefaultCard extends UnicastRemoteObject implements Card {
     /**
      * Type of the card
      */
-    private Type color;
+    private Type type;
 
     /**
      * Value of the card
@@ -21,7 +21,7 @@ public class DefaultCard extends UnicastRemoteObject implements Card {
     private Integer value;
 
     public DefaultCard(Type type, Name name) throws RemoteException {
-        this.color = type;
+        this.type = type;
         this.name = name;
         switch(name) {
             case Ace:
@@ -67,17 +67,17 @@ public class DefaultCard extends UnicastRemoteObject implements Card {
     }
 
     @Override
+    public Name getName() throws RemoteException {
+        return name;
+    }
+
+    @Override
     public Integer getValue() throws RemoteException {
-        return null;
+        return value;
     }
 
     @Override
     public Type getType() throws RemoteException {
-        return null;
-    }
-
-    @Override
-    public Name getName() throws RemoteException {
-        return null;
+        return type;
     }
 }

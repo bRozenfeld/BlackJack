@@ -14,6 +14,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 import static java.lang.System.exit;
@@ -57,6 +59,7 @@ public class GameImpl implements Game {
 
     @Override
     public boolean register(Player player) throws RemoteException {
+        System.out.println("New player " + player.getName() + " has joined the table \uD83e\uDD11");
         return players.add(player);
     }
 
@@ -88,6 +91,7 @@ public class GameImpl implements Game {
         for(Player p : players) {
             Card c = cards.remove(random);
             p.addCard(c);
+            p.displayCards();
             random = getRandomInt();
         }
 
@@ -97,10 +101,25 @@ public class GameImpl implements Game {
         for(Player p : players) {
             Card c = cards.remove(random);
             p.addCard(c);
+            p.displayCards();
             random = getRandomInt();
-        }
 
-        askPlayersAction();
+            p.chooseAction();
+            while(p.getAction() == Action.WAIT) {
+                try {
+                    Thread.sleep(2000);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if(p.getAction() == Action.ADDCARD) {
+                c = cards.remove(random);
+                p.addCard(c);
+                p.displayCards();
+                random = getRandomInt();
+                p.setAction(Action.WAIT);
+            }
+        }
     }
 
 
@@ -166,6 +185,7 @@ public class GameImpl implements Game {
                 cards.add(c);
             }
         }
+        Collections.shuffle(cards);
     }
 
     /**
