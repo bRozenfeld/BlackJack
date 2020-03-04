@@ -3,6 +3,7 @@ package fr.ensibs.player;
 import fr.ensibs.card.Card;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.List;
 
 public interface Player extends Remote {
@@ -40,6 +41,13 @@ public interface Player extends Remote {
      * Add a card to the player list of cards
      * @param card card to add to the list of player cards
      */
-    void addCard(Card card);
+    void addCard(Card card) throws RemoteException;
+    /**
+     * Give the player action
+     *
+     * @return the player action
+     */
+    Action getAction() throws RemoteException;
 
+    void setAction(Action action) throws RemoteException;
 }

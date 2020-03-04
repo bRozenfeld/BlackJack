@@ -20,6 +20,10 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
      * Player list of cards
      */
     private List<Card> cards;
+    /**
+     * Action of the player
+     */
+    private Action action;
 
     /*******************Constructor********************/
 
@@ -33,6 +37,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
         this.name=name;
         this.score=0;
         this.cards=new ArrayList<Card>();
+        this.action=Action.WAIT;
 
     }
     /*******************Override methods ********************/
@@ -95,5 +100,20 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
     @Override
     public void addCard(Card card) {
         this.cards.add(card);
+    }
+
+    /**
+     * Give the player action
+     *
+     * @return the player action
+     */
+    @Override
+    public Action getAction() throws RemoteException {
+        return this.action;
+    }
+
+    @Override
+    public void setAction(Action action) throws RemoteException{
+        this.action=action;
     }
 }
