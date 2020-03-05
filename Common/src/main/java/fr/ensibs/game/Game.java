@@ -24,6 +24,10 @@ public interface Game extends Remote {
      */
     public void startGame() throws RemoteException;
 
-
-
+    /**
+     * Unregister a player
+     * @param player
+     * @throws RemoteException
+     */
+    public void unregister(Player player) throws RemoteException;
 }

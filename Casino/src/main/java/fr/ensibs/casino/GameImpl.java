@@ -69,6 +69,11 @@ public class GameImpl implements Game {
 
     }
 
+    @Override
+    public void unregister(Player player) throws RemoteException {
+
+    }
+
     public static void askPlayersAction() throws RemoteException {
         for(Player p : players) {
             while(p.getAction() == Action.WAIT) {
@@ -124,6 +129,7 @@ public class GameImpl implements Game {
                     p.setAction(Action.WAIT);
                 }
             }
+            p.setAction(Action.WAIT);
         }
 
         // after all the players, the dealer get a 2nd card and continue to add if he has less than 17 points
@@ -241,6 +247,12 @@ public class GameImpl implements Game {
         exit(1);
     }
 
+    /**
+     * Method to ask if player continue or not
+     */
+    private static void notifyEndOfGame(){
+
+    }
 
     /**
      * Generate a random int between 0 and the size of the deck cards
