@@ -77,6 +77,11 @@ public class DefaultCard extends UnicastRemoteObject implements Card {
     }
 
     @Override
+    public void setValue(Integer value) throws RemoteException {
+        this.value = value;
+    }
+
+    @Override
     public Type getType() throws RemoteException {
         return type;
     }

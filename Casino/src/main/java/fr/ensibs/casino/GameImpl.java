@@ -5,6 +5,7 @@ import fr.ensibs.card.DefaultCard;
 import fr.ensibs.card.Name;
 import fr.ensibs.card.Type;
 import fr.ensibs.game.Game;
+import fr.ensibs.game.Result;
 import fr.ensibs.game.State;
 import fr.ensibs.player.Action;
 import fr.ensibs.player.Player;
@@ -98,28 +99,68 @@ public class GameImpl implements Game {
         Card dealerCard = cards.remove(random);
         dealerCards.add(dealerCard);
 
-        for(Player p : players) {
+        for (Player p : players) {
+            // Getting the 2nd card
             Card c = cards.remove(random);
             p.addCard(c);
             p.displayCards();
             random = getRandomInt();
 
-            p.chooseAction();
-            while(p.getAction() == Action.WAIT) {
-                try {
-                    Thread.sleep(2000);
-                } catch(Exception e) {
-                    e.printStackTrace();
+            // while player not satisfy, continue to serve him
+            while(p.getAction() != Action.STOP) {
+                p.chooseAction();
+                while (p.getAction() == Action.WAIT) {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (p.getAction() == Action.ADDCARD) {
+                    c = cards.remove(random);
+                    p.addCard(c);
+                    p.displayCards();
+                    random = getRandomInt();
+                    p.setAction(Action.WAIT);
                 }
             }
-            if(p.getAction() == Action.ADDCARD) {
-                c = cards.remove(random);
-                p.addCard(c);
-                p.displayCards();
-                random = getRandomInt();
-                p.setAction(Action.WAIT);
+        }
+
+        // after all the players, the dealer get a 2nd card and continue to add if he has less than 17 points
+        random = getRandomInt();
+        dealerCard = cards.remove(random);
+        dealerCards.add(dealerCard);
+        int dealerScore = getDealerScore();
+        while(dealerScore < 17) {
+            random = getRandomInt();
+            dealerCard = cards.remove(random);
+            dealerCards.add(dealerCard);
+            dealerScore = getDealerScore();
+        }
+
+        for(Player p: players) {
+            p.displayDealerCards(dealerCards);
+            int playerScore = p.getScore();
+
+            // Player has score > 21 -> lose
+            if(playerScore > 21) {
+                p.setResult(Result.Lose);
+            } // player under 22 and dealer > 21 -> win
+            else if(dealerScore > 21) {
+                p.setResult(Result.Win);
+            } // player under 22, dealer under 22 and player > dealer -> win
+            else if((playerScore > dealerScore)) {
+                p.setResult(Result.Win);
+            } // player under 22, dealer under 22 and player == dealer -> nul
+            else if(playerScore == dealerScore) {
+                p.setResult(Result.Draw);
+            } // player under 22, dealer under 22, player < dealer -> lose
+            else {
+                p.setResult(Result.Lose);
             }
         }
+
+
     }
 
 
@@ -201,10 +242,35 @@ public class GameImpl implements Game {
     }
 
 
+    /**
+     * Generate a random int between 0 and the size of the deck cards
+     * @return int
+     */
     private static int getRandomInt() {
         Random rand = new Random();
         return rand.nextInt(cards.size());
     }
+
+
+    private static int getDealerScore() throws RemoteException {
+        int score = 0;
+        int numberOfAce = 0;
+        for(Card c : dealerCards) {
+            if(c.getName() == Name.Ace) {
+                numberOfAce++;
+            }
+            score += c.getValue();
+        }
+
+        if(score > 21) {
+            while(numberOfAce > 0) {
+                score -= 10;
+                numberOfAce--;
+            }
+        }
+        return score;
+    }
+
 
     public static void main(String[] args) throws RemoteException {
 

@@ -1,6 +1,7 @@
 package fr.ensibs.player;
 
 import fr.ensibs.card.Card;
+import fr.ensibs.game.Result;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -54,4 +55,8 @@ public interface Player extends Remote {
     void chooseAction()throws RemoteException;
 
     void displayCards() throws RemoteException;
+
+    void displayDealerCards(List<Card> cards) throws RemoteException;
+
+    void setResult(Result result) throws RemoteException;
 }

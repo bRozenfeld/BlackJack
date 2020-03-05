@@ -1,6 +1,8 @@
 package fr.ensibs.player;
 
 import fr.ensibs.card.Card;
+import fr.ensibs.card.Name;
+import fr.ensibs.game.Result;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -70,7 +72,39 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
      */
     @Override
     public Integer getScore() {
+        this.score = 0;
+        int numberOfAce = 0;
+        try {
+            for (Card c : cards) {
+                if(c.getName() == Name.Ace) numberOfAce++;
+                this.score += c.getValue();
+            }
+        } catch(RemoteException e) {
+            e.printStackTrace();
+        }
+
+        if(this.score > 21) {
+            while(numberOfAce > 0) {
+                this.score -= 10;
+                numberOfAce--;
+            }
+        }
         return this.score;
+    }
+
+    @Override
+    public void setResult(Result result) throws RemoteException {
+        switch(result) {
+            case Win:
+                System.out.println("You win !");
+                break;
+            case Lose:
+                System.out.println("You lose !");
+                break;
+            case Draw:
+                System.out.println("Draw game !");
+                break;
+        }
     }
 
     /**
@@ -136,7 +170,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
 
     @Override
     public void displayCards() throws RemoteException {
-        String s = "";
+        String s = "YOUR CARDS :\n";
         for(Card c : cards) {
             s += "+-------+\t";
         }
@@ -223,6 +257,96 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
         System.out.println(s);
     }
 
+
+    @Override
+    public void displayDealerCards(List<Card> dCards) throws RemoteException {
+        String s = "DEALERS CARDS :\n";
+        for(Card c : dCards) {
+            s += "+-------+\t";
+        }
+        s += "\n";
+        for(Card c : dCards) {
+            switch(c.getName()) {
+                case Ace:
+                    s += "| 1     |";
+                    break;
+                case Two:
+                    s += "| 2     |";
+                    break;
+                case Three:
+                    s += "| 3     |";
+                    break;
+                case Four:
+                    s += "| 4     |";
+                    break;
+                case Five:
+                    s += "| 5     |";
+                    break;
+                case Six:
+                    s += "| 6     |";
+                    break;
+                case Seven:
+                    s += "| 7     |";
+                    break;
+                case Eight:
+                    s += "| 8     |";
+                    break;
+                case Nine:
+                    s += "| 9     |";
+                    break;
+                case Ten:
+                    s += "| 10    |";
+                    break;
+                case Jack:
+                    s += "| J     |";
+                    break;
+                case Queen:
+                    s += "| Q     |";
+                    break;
+                case King:
+                    s += "| K     |";
+                    break;
+            }
+            s += "\t";
+        }
+        s += "\n";
+        for(Card c : dCards) {
+            s += "|       |\t";
+        }
+        s += "\n";
+        for(Card c : dCards) {
+            switch (c.getType()) {
+                case Diamond:
+                    s += "|   \u2666   |\t";
+                    break;
+                case Spade:
+                    s += "|   \u2660   |\t";
+                    break;
+                case Heart:
+                    s += "|   \u2665   |\t";
+                    break;
+                case Club:
+                    s += "|   \u2663   |\t";
+                    break;
+            }
+        }
+        s += "\n";
+        for(Card c : dCards) {
+            s += "|       |\t";
+        }
+        s += "\n";
+        for(Card c : dCards) {
+            s += "|       |\t";
+        }
+        s += "\n";
+        for(Card c : dCards) {
+            s += "+-------+\t";
+        }
+        s += "\n";
+
+        System.out.println(s);
+    }
+
     /**
      * Display the status of the device having the given id, if it exists
      *
@@ -242,7 +366,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
      */
     public void stop() throws RemoteException
     {
-        this.setAction(Action.WAIT);
+        this.setAction(Action.STOP);
         try { Thread.sleep(2000); } catch (Exception e) { }
 
     }
