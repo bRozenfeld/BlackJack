@@ -23,5 +23,19 @@
         <module>Common</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>fr.ensibs</groupId>
+            <artifactId>joram-server</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.ensibs</groupId>
+            <artifactId>joram-admin</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
+
 
 </project>

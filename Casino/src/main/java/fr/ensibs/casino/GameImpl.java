@@ -7,9 +7,12 @@ import fr.ensibs.card.Type;
 import fr.ensibs.game.Game;
 import fr.ensibs.game.Result;
 import fr.ensibs.game.State;
+import fr.ensibs.joram.Joram;
+import fr.ensibs.joram.JoramAdmin;
 import fr.ensibs.player.Action;
 import fr.ensibs.player.Player;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -27,8 +30,10 @@ import static java.lang.System.exit;
 public class GameImpl implements Game {
 
     private static String HOST = "localhost";
-    private static Integer PORT = 5000;
+    private static Integer RMI_PORT = 5005;
+    private static Integer JMS_PORT = 5000;
     private static final String OBJECT = "BLACK_JACK";
+    private static final String TOPIC = "CHAT";
 
     /**
      * List of the Player register to this game
@@ -46,6 +51,16 @@ public class GameImpl implements Game {
     private static State state;
 
     /**
+     * Instance that manage the chat
+     */
+    private static JoramAdmin joramAdmin;
+
+    /**
+     * Instance of joram used to jms
+     */
+    private static Joram joramServer;
+
+    /**
      * Cards of the dealer
      */
     private static ArrayList<Card> dealerCards;
@@ -56,6 +71,14 @@ public class GameImpl implements Game {
         this.cards = new ArrayList<Card>();
         this.dealerCards = new ArrayList<Card>();
         this.state = State.Waiting;
+        try {
+            this.joramServer = new Joram(JMS_PORT);
+            this.joramServer.run();
+            this.joramAdmin = new JoramAdmin("localhost", JMS_PORT);
+            this.joramAdmin.createTopic(TOPIC);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -290,13 +313,13 @@ public class GameImpl implements Game {
             usage();
         }
         HOST = args[0];
-        PORT = Integer.valueOf(args[1]);
+        RMI_PORT = Integer.valueOf(args[1]);
 
         try {
             Game game = new GameImpl();
             Game stub = (Game) UnicastRemoteObject.exportObject(game, 0);
-            Registry registry = LocateRegistry.createRegistry(PORT);
-            String url = "rmi://" + HOST + ":" + PORT + "/" + OBJECT;
+            Registry registry = LocateRegistry.createRegistry(RMI_PORT);
+            String url = "rmi://" + HOST + ":" + RMI_PORT + "/" + OBJECT;
             registry.bind(url, stub);
 
         } catch(Exception e) {
