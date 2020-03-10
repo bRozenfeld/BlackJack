@@ -16,7 +16,7 @@ public class TextListener implements MessageListener {
         try{
             if(m instanceof TextMessage){
                 TextMessage tMessage = (TextMessage) m;
-                System.out.println(player.getName() +": "+tMessage.getText());
+                System.out.println(tMessage.getText());
             }else{
                 System.out.println("Message is not an ObjectMessage ");
             }

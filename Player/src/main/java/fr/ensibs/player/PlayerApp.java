@@ -9,22 +9,23 @@ import javax.naming.NamingException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class PlayerApp {
     /**
      * Player Who will play BlackJack
      */
-    private Player player;
+    private static Player player;
 
     /**
      * the server of the game
      */
     private Game game;
-    /**
-     * the JNDI context
-     */
-    private static Context context;
+
+
+    private static ConnectionFactory factory;
+
     /**
      * the JMS context
      */
@@ -59,29 +60,37 @@ public class PlayerApp {
     public static void main(String[] args)  {
         if (args.length != 3 || args[0].equals("-h")) {
             usage();
-        }else {
-            try {
-                System.setProperty("java.naming.factory.initial", "fr.dyade.aaa.jndi2.client.NamingContextFactory");
-                System.setProperty("java.naming.factory.host", HOST);
-                System.setProperty("java.naming.factory.port", JMSPORT);
-                HOST = args[0];
-                RMIPORT = Integer.valueOf(args[1]);
+        }
 
-                Registry registry = LocateRegistry.getRegistry(RMIPORT);
-                String url = "rmi://" + HOST + ":" + RMIPORT + "/" + obj_name;
-                Game game=(Game) registry.lookup(url);
+        HOST = args[0];
+        RMIPORT = Integer.valueOf(args[1]);
 
-                context=new InitialContext();
-                ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
-                destination =(Destination) context.lookup(DESTINATION);
-                ctx=factory.createContext();
-                PlayerApp playerapp=new PlayerApp(args[2],game);
-                playerapp.run();
+        System.setProperty("java.naming.factory.initial", "fr.dyade.aaa.jndi2.client.NamingContextFactory");
+        System.setProperty("java.naming.factory.host", HOST);
+        System.setProperty("java.naming.factory.port", JMSPORT);
+
+        try {
+
+            Registry registry = LocateRegistry.getRegistry(RMIPORT);
+            String url = "rmi://" + HOST + ":" + RMIPORT + "/" + obj_name;
+            Game game=(Game) registry.lookup(url);
+
+            Context context = new InitialContext();
+            factory = (ConnectionFactory) context.lookup("ConnectionFactory");
+            destination =(Destination) context.lookup(DESTINATION);
+            ctx = factory.createContext();
+
+            player = new PlayerImpl(args[2]);
+
+            JMSConsumer consumer = ctx.createConsumer(destination);
+            consumer.setMessageListener(new TextListener(player));
+
+            PlayerApp playerapp=new PlayerApp(args[2],game);
+            playerapp.run();
 
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -93,11 +102,9 @@ public class PlayerApp {
      */
     public PlayerApp(String playername,Game game) throws RemoteException {
 
-       player=new PlayerImpl(playername);
+       //player=new PlayerImpl(playername);
        this.game=game;
        this.game.register(player);
-        JMSConsumer consumer = ctx.createConsumer(destination);
-        consumer.setMessageListener(new TextListener(this.player));
 
     }
 
@@ -106,29 +113,27 @@ public class PlayerApp {
      */
     public void run() throws NamingException, JMSException,RemoteException {
         System.out.println("Hello, " + this.player.getName() + ". Enter commands:"
-                + "\n CHAT <messgae>   to chat with the other players");
+                + "\n CHAT <message>   to chat with the other players");
 
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
         String[] command = line.split(" +");
         while(true) {
             if (command[0].equals("chat") || command[0].equals("CHAT")) {
-                String message = command[1];
+                command[0] = "";
+                String message = String.join(" ", command);
                 sendMessage(message);
-                line = scanner.nextLine();
-                command = line.split(" +");
             }
             else if (player.getAction()==Action.IS_CHOOSING){
-
                    if(command[0].equals("continue")||command[0].equals("CONTINUE"))
                        player.setAction(Action.ADDCARD);
                    else if(command[0].equals("stop")||command[0].equals("STOP"))
                        player.setAction(Action.STOP);
                    else
                        System.out.println("Wrong command \n"+player.getName()+" turn: CONTINUE to get an other card or STOP to stop ?");
-
-
             }
+            line = scanner.nextLine();
+            command = line.split(" +");
         }
         //System.err.println("Unknown command: \"" + command[0] + "\"");
     }
@@ -137,11 +142,13 @@ public class PlayerApp {
      * Chat with the other players
      */
     public void sendMessage(String msg){
-
-        TextMessage message=ctx.createTextMessage(msg);
-        JMSProducer producer= ctx.createProducer();
-        producer.send(destination,message);
-        System.out.println("message bien envoye");
+        try(JMSContext jmsContext = ctx.createContext(JMSContext.AUTO_ACKNOWLEDGE);) {
+            JMSProducer producer= jmsContext.createProducer();
+            String message = player.getName() + " : " + msg;
+            producer.send(destination, message);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
