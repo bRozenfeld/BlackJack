@@ -106,17 +106,29 @@ public class PlayerApp {
      */
     public void run() throws NamingException, JMSException,RemoteException {
         System.out.println("Hello, " + this.player.getName() + ". Enter commands:"
-                + "\n QUIT                     to quit the application"
                 + "\n CHAT <messgae>   to chat with the other players");
 
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
         String[] command = line.split(" +");
-        while (command[0].equals("chat") || command[0].equals("CHAT")) {
-            String message= command[1];
-            sendMessage(message);
-            line = scanner.nextLine();
-            command = line.split(" +");
+        while(true) {
+            if (command[0].equals("chat") || command[0].equals("CHAT")) {
+                String message = command[1];
+                sendMessage(message);
+                line = scanner.nextLine();
+                command = line.split(" +");
+            }
+            else if (player.getAction()==Action.IS_CHOOSING){
+
+                   if(command[0].equals("continue")||command[0].equals("CONTINUE"))
+                       player.setAction(Action.ADDCARD);
+                   else if(command[0].equals("stop")||command[0].equals("STOP"))
+                       player.setAction(Action.STOP);
+                   else
+                       System.out.println("Wrong command \n"+player.getName()+" turn: CONTINUE to get an other card or STOP to stop ?");
+
+
+            }
         }
         //System.err.println("Unknown command: \"" + command[0] + "\"");
     }

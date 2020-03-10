@@ -155,17 +155,8 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
     @Override
     public void chooseAction()throws RemoteException
     {
-        System.out.println("Continue[0] or Stop[1] ?");
-        Scanner scanner = new Scanner(System.in);
-        Integer line = scanner.nextInt();
-        switch (line) {
-            case 0:
-                addCard();
-                break;
-            case 1:
-                stop();
-                break;
-        }
+        setAction(Action.IS_CHOOSING);
+        System.out.println(getName()+" turn: CONTINUE to get an other card or STOP to stop ?");
     }
 
     @Override
@@ -367,7 +358,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
     public void stop() throws RemoteException
     {
         this.setAction(Action.STOP);
-        try { Thread.sleep(2000); } catch (Exception e) { }
+
 
     }
 
@@ -377,7 +368,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
     public void addCard() throws RemoteException
     {
         this.setAction(Action.ADDCARD);
-        try { Thread.sleep(2000); } catch (Exception e) { }
+
     }
     /**
      *
@@ -385,7 +376,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
     public void waiT() throws RemoteException
     {
         this.setAction(Action.WAIT);
-        try { Thread.sleep(2000); } catch (Exception e) { }
+
     }
 
 }
