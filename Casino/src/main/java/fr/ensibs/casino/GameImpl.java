@@ -151,7 +151,7 @@ public class GameImpl implements Game {
                     p.addCard(c);
                     p.displayCards();
                     random = getRandomInt();
-                    if(p.getScore() > 21) p.setAction(STOP);
+                    if(p.getScore() >= 21) p.setAction(STOP);
                     else p.setAction(IS_CHOOSING);
                 }
             }
