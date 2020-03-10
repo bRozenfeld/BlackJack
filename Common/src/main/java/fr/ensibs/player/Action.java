@@ -5,6 +5,7 @@ package fr.ensibs.player;
  */
 public enum Action {
     WAIT,
+    //WAITFORRESPONSE,
     ADDCARD,
     STOP
 }
