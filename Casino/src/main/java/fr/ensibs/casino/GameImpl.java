@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 
+import static fr.ensibs.player.Action.IS_CHOOSING;
+import static fr.ensibs.player.Action.STOP;
 import static java.lang.System.exit;
 
 /**
@@ -135,9 +137,9 @@ public class GameImpl implements Game {
             random = getRandomInt();
 
             // while player not satisfy, continue to serve him
-            while(p.getAction() != Action.STOP) {
+            while(p.getAction() != STOP) {
                 p.chooseAction();
-                while (p.getAction() == Action.WAIT) {
+                while (p.getAction() == IS_CHOOSING) {
                     try {
                         Thread.sleep(2000);
                     } catch (Exception e) {
@@ -149,7 +151,8 @@ public class GameImpl implements Game {
                     p.addCard(c);
                     p.displayCards();
                     random = getRandomInt();
-                    p.setAction(Action.WAIT);
+                    if(p.getScore() > 21) p.setAction(STOP);
+                    else p.setAction(IS_CHOOSING);
                 }
             }
             p.setAction(Action.WAIT);
