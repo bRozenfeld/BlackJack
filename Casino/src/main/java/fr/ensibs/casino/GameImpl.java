@@ -74,7 +74,7 @@ public class GameImpl implements Game {
         try {
             this.joramServer = new Joram(JMS_PORT);
             this.joramServer.run();
-            this.joramAdmin = new JoramAdmin("localhost", JMS_PORT);
+            this.joramAdmin = new JoramAdmin(HOST, JMS_PORT);
             this.joramAdmin.createTopic(TOPIC);
         } catch(Exception e) {
             e.printStackTrace();
@@ -94,7 +94,7 @@ public class GameImpl implements Game {
 
     @Override
     public void unregister(Player player) throws RemoteException {
-
+        players.remove(player);
     }
 
     public static void askPlayersAction() throws RemoteException {
