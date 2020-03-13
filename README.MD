@@ -1,4 +1,4 @@
-# Blacjack middleware application réalisé par SBAITY Haitam-ROZENFELD Benjamin
+# Blackjack (middleware application) réalisé par SBAITY Haitam-ROZENFELD Benjamin
 
 Blackjack is a game between the dealer (server) and the other players (client). For each player, the goal is to obtain a total point superior than the dealer, without exceeding 21.
 Each player can chat with the other players.
