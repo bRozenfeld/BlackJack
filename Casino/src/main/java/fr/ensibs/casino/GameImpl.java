@@ -31,7 +31,8 @@ import static java.lang.System.exit;
  */
 public class GameImpl implements Game {
 
-    private static String HOST = "localhost";
+    private static String HOST_RMI = "localhost";
+    private static String HOST_JMS = "localhost";
     private static Integer RMI_PORT = 5005;
     private static Integer JMS_PORT = 5000;
     private static final String OBJECT = "BLACK_JACK";
@@ -76,7 +77,7 @@ public class GameImpl implements Game {
         try {
             this.joramServer = new Joram(JMS_PORT);
             this.joramServer.run();
-            this.joramAdmin = new JoramAdmin(HOST, JMS_PORT);
+            this.joramAdmin = new JoramAdmin(HOST_JMS, JMS_PORT);
             this.joramAdmin.createTopic(TOPIC);
         } catch(Exception e) {
             e.printStackTrace();
@@ -90,28 +91,16 @@ public class GameImpl implements Game {
     }
 
     @Override
-    public void startGame() throws RemoteException {
-
-    }
-
-    @Override
     public void unregister(Player player) throws RemoteException {
+        System.out.println("Player " + player.getName() + " has left the table ");
         players.remove(player);
     }
 
-    public static void askPlayersAction() throws RemoteException {
-        for(Player p : players) {
-            while(p.getAction() == Action.WAIT) {
-                try {
-                    Thread.sleep(2000);
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
 
-
+    /**
+     * Start a game of black jack
+     * @throws RemoteException
+     */
     public static void play() throws RemoteException {
         System.out.println("Game started !");
 
@@ -191,11 +180,12 @@ public class GameImpl implements Game {
                 p.setResult(Result.Lose);
             }
         }
-
-
     }
 
-
+    /**
+     * Initialise the cards for the game
+     * @throws RemoteException
+     */
     private static void initCards() throws RemoteException {
         for(int i = 0; i < 4; i++) {
             Type type = null;
@@ -266,18 +256,8 @@ public class GameImpl implements Game {
      */
     private static void usage() {
         System.out.println("Launch the app :");
-        System.out.println("java -jar GameApp <host> <port>");
-        System.out.println("with :");
-        System.out.println("<host> : host of the server");
-        System.out.println("<port> : port of the server");
+        System.out.println("java -jar GameApp <host_rmi> <port_rmi> <host_jms> <port_jms>");
         exit(1);
-    }
-
-    /**
-     * Method to ask if player continue or not
-     */
-    private static void notifyEndOfGame(){
-
     }
 
     /**
@@ -289,7 +269,11 @@ public class GameImpl implements Game {
         return rand.nextInt(cards.size());
     }
 
-
+    /**
+     * Calculate the score of the dealer
+     * @return int containing the score of the dealer
+     * @throws RemoteException
+     */
     private static int getDealerScore() throws RemoteException {
         int score = 0;
         int numberOfAce = 0;
@@ -312,17 +296,19 @@ public class GameImpl implements Game {
 
     public static void main(String[] args) throws RemoteException {
 
-        if(args.length != 2) {
+        if(args.length != 4) {
             usage();
         }
-        HOST = args[0];
+        HOST_RMI = args[0];
         RMI_PORT = Integer.valueOf(args[1]);
+        HOST_JMS = args[2];
+        JMS_PORT = Integer.valueOf(args[3]);
 
         try {
             Game game = new GameImpl();
             Game stub = (Game) UnicastRemoteObject.exportObject(game, 0);
             Registry registry = LocateRegistry.createRegistry(RMI_PORT);
-            String url = "rmi://" + HOST + ":" + RMI_PORT + "/" + OBJECT;
+            String url = "rmi://" + HOST_RMI + ":" + RMI_PORT + "/" + OBJECT;
             registry.bind(url, stub);
 
         } catch(Exception e) {
@@ -342,5 +328,4 @@ public class GameImpl implements Game {
 
         }
     }
-
 }

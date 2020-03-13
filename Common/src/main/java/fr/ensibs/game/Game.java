@@ -19,12 +19,6 @@ public interface Game extends Remote {
     public boolean register(Player player) throws RemoteException;
 
     /**
-     * Start a new game and call all the player register to it
-     * @throws RemoteException
-     */
-    public void startGame() throws RemoteException;
-
-    /**
      * Unregister a player
      * @param player
      * @throws RemoteException

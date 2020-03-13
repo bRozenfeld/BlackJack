@@ -39,9 +39,10 @@ public class PlayerApp {
      */
     private static  String DESTINATION="CHAT";
 
-    private static String HOST = "localhost";
-    private static String JMSPORT = "5000";
-    private static Integer RMIPORT = 5005;
+    private static String HOST_JMS = "localhost";
+    private static String HOST_RMI = "localhost";
+    private static Integer JMS_PORT = 5000;
+    private static Integer RMI_PORT = 5005;
 
 
     private static final String obj_name = "BLACK_JACK";
@@ -52,27 +53,29 @@ public class PlayerApp {
      */
     private static void usage()
     {
-        System.out.println("Usage: java PlayerApp <Host> <Port> <player_name>");
+        System.out.println("Usage: java PlayerApp <host_rmi> <port_rmi>  <host_jms> <port_jms> <player_name>");
         System.out.println("An application client who will connect to the casino server to play BlackJack");
         System.exit(-1);
     }
 
     public static void main(String[] args)  {
-        if (args.length != 3 || args[0].equals("-h")) {
+        if (args.length != 5 || args[0].equals("-h")) {
             usage();
         }
 
-        HOST = args[0];
-        RMIPORT = Integer.valueOf(args[1]);
+        HOST_RMI = args[0];
+        RMI_PORT = Integer.valueOf(args[1]);
+        HOST_JMS = args[2];
+        JMS_PORT = Integer.valueOf(args[3]);
 
         System.setProperty("java.naming.factory.initial", "fr.dyade.aaa.jndi2.client.NamingContextFactory");
-        System.setProperty("java.naming.factory.host", HOST);
-        System.setProperty("java.naming.factory.port", JMSPORT);
+        System.setProperty("java.naming.factory.host", HOST_JMS);
+        System.setProperty("java.naming.factory.port", String.valueOf(JMS_PORT));
 
         try {
 
-            Registry registry = LocateRegistry.getRegistry(RMIPORT);
-            String url = "rmi://" + HOST + ":" + RMIPORT + "/" + obj_name;
+            Registry registry = LocateRegistry.getRegistry(RMI_PORT);
+            String url = "rmi://" + HOST_RMI + ":" + RMI_PORT + "/" + obj_name;
             Game game=(Game) registry.lookup(url);
 
             Context context = new InitialContext();
@@ -80,12 +83,12 @@ public class PlayerApp {
             destination =(Destination) context.lookup(DESTINATION);
             ctx = factory.createContext();
 
-            player = new PlayerImpl(args[2]);
+            player = new PlayerImpl(args[4]);
 
             JMSConsumer consumer = ctx.createConsumer(destination);
             consumer.setMessageListener(new TextListener(player));
 
-            PlayerApp playerapp=new PlayerApp(args[2],game);
+            PlayerApp playerapp=new PlayerApp(args[4],game);
             playerapp.run();
 
 
@@ -150,12 +153,4 @@ public class PlayerApp {
             e.printStackTrace();
         }
     }
-
-
-
-
-
-
-
-
-    }
+}
