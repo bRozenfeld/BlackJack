@@ -353,7 +353,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
     }
 
     /**
-     * Stop the device
+     * Change the current action to STOP
      */
     public void stop() throws RemoteException
     {
@@ -363,7 +363,7 @@ public class PlayerImpl extends UnicastRemoteObject implements Player {
     }
 
     /**
-     *
+     * Change the current action to ADD CARD
      */
     public void addCard() throws RemoteException
     {
